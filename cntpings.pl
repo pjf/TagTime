@@ -8,7 +8,29 @@
 #  aux/showvenn.pl -- not sure about this one
 #  ../kibo/timepiekib.pl -- converts tagtime log to kib file 
 
-BEGIN { require "$ENV{HOME}/.tagtimerc"; }
+use FindBin qw($Bin);
+
+# cntpings doesn't really *need* the config file, it's just
+# processing a file of stats. So we'll allow things to run
+# even if .tagtimerc isn't found. This can be the case if you
+# have an android user who just wants to crunch their file,
+# or a Windows user (since tagtime assumes $ENV{HOME}, which
+# doesn't exist on Windows). -- PJF
+
+BEGIN { 
+    use strict;
+    use warnings;
+
+    eval {
+        require "$ENV{HOME}/.tagtimerc"; 
+    };
+
+    if ($@) {
+        warn ".tagtimerc not found. Using defaults.";
+        our $path = "$Bin";
+    }
+}
+
 use lib $path, "$path/lib";
 
 require "util.pl";
